@@ -102,84 +102,136 @@
         <div class="chat">
             <div id="messages"></div>
             
-            <input type="text" id="input" placeholder="Ask me anything or ask a math problem...">
+            <input type="text" id="input" placeholder="Ask me anything or math problems...">
             <button onclick="send()">Send</button>
         </div>
     </div>
 
     <script>
-        // MASSIVE KNOWLEDGE BASE
         var knowledgeBase = {
-            // === ROBLOX STUDIO (PRIORITY) ===
-            "roblox": "I can help you with Roblox Studio! I know about building, scripting in Lua, creating GUIs, game mechanics, tools, effects, and more. What specific aspect of Roblox development would you like to learn about?",
+            "roblox": "I can help with Roblox Studio development!",
+            "lava": "To create lava: Insert part → orange/red color → Material = Neon → Anchor it → Add this script:\n\nscript.Parent.Touched:Connect(function(hit)\n    if hit.Parent:FindFirstChild('Humanoid') then\n        hit.Parent.Humanoid.Health = 0\n    end\nend)",
+            "part": "To add parts: Click Part button → Choose shape → Use M to move, R to scale, T to rotate.",
+            "script": "To add script: Select part → Click + in Explorer → Choose Script → Write Lua code → F5 to test.",
+        };
+
+        var jokes = [
+            "Why don't scientists trust atoms? Because they make up everything!",
+            "What do you call a bear with no teeth? A gummy bear!",
+            "Why did the bicycle fall over? It was two-tired!",
+            "What do you call a fake noodle? An impasta!",
+            "What did the ocean say to the beach? Nothing, it just waved!"
+        ];
+
+        addBot("Hello! I can solve ANY math problem!\n\nTry:\n• 4x4\n• 5*3\n• 100 + 50\n• 20 - 10\n• 100 / 5\n• 12 times 7\n\nI also know about Roblox and other topics!");
+
+        function addBot(text) {
+            var div = document.createElement('div');
+            div.className = 'message bot';
+            div.innerText = text;
+            document.getElementById('messages').appendChild(div);
+            document.getElementById('messages').scrollTop = 999999;
+        }
+
+        function addUser(text) {
+            var div = document.createElement('div');
+            div.className = 'message user';
+            div.innerText = text;
+            document.getElementById('messages').appendChild(div);
+            document.getElementById('messages').scrollTop = 999999;
+        }
+
+        function random(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function solveMath(msg) {
+            var lower = msg.toLowerCase();
             
-            "studio": "Roblox Studio is a free game development platform where you can create 3D games. It uses the Lua programming language for scripting. You can build worlds, script gameplay, design GUIs, and publish your games for millions of players. What would you like to create?",
+            // Replace 'x' and 'X' with '*' for multiplication
+            var cleaned = lower.replace(/\s*x\s*/g, '*');
+            cleaned = cleaned.replace(/\s*times\s*/g, '*');
+            cleaned = cleaned.replace(/multiply\s+(\d+)\s+by\s+(\d+)/g, '$1*$2');
             
-            "start": "To get started with Roblox Studio:\n\n1. Download Roblox Studio for free from roblox.com\n2. Open it and click 'New'\n3. Choose 'Baseplate' for a blank canvas\n4. Press F5 to test your game anytime\n5. Save regularly with Ctrl+S\n\nThe main tools are Move (M), Scale (R), and Rotate (T). What would you like to build?",
+            // Remove words like "what is", "calculate", etc.
+            cleaned = cleaned.replace(/what\s+is\s+/g, '');
+            cleaned = cleaned.replace(/calculate\s+/g, '');
+            cleaned = cleaned.replace(/solve\s+/g, '');
             
-            "part": "To add parts in Roblox Studio:\n\n1. Click the 'Part' button in the Home tab\n2. Choose your shape: Block, Sphere, Cylinder, or Wedge\n3. Use Move tool (M) to position it\n4. Use Scale tool (R) to resize it\n5. Use Rotate tool (T) to rotate it\n\nCopy with Ctrl+C, paste with Ctrl+V. Parts are the building blocks of your game!",
+            // Check if there's a math operation
+            if (cleaned.match(/\d+[\+\-\*\/]\d+/)) {
+                try {
+                    var result = eval(cleaned);
+                    if (typeof result === 'number') {
+                        return "🧮 " + msg + " = " + result;
+                    }
+                } catch(e) {
+                    return null;
+                }
+            }
             
-            "script": "To add scripts in Roblox Studio:\n\n1. Select a part in the Explorer\n2. Click '+' next to it\n3. Choose 'Script' (server-side) or 'LocalScript' (client-side)\n4. Write your Lua code\n5. Press F5 to test\n\nExample script:\nprint('Hello, Roblox!')\n\nScripts control game logic, player interactions, and more.",
-            
-            "lava": "To create a lava block:\n\n1. Insert a Part\n2. Set color to orange/red (BrickColor)\n3. Set Material to 'Neon' for glow\n4. Anchor it (check box in Properties)\n5. Add Script:\n\nscript.Parent.Touched:Connect(function(hit)\n    if hit.Parent:FindFirstChild('Humanoid') then\n        hit.Parent.Humanoid.Health = 0\n    end\nend)\n\nOptionally add Fire object for flames!",
+            return null;
+        }
 
-            "kill": "Kill block script:\n\nscript.Parent.Touched:Connect(function(hit)\n    if hit.Parent:FindFirstChild('Humanoid') then\n        hit.Parent.Humanoid.Health = 0\n    end\nend)\n\nThis instantly kills any player who touches it. Make it red so players know it's dangerous!",
+        function send() {
+            var input = document.getElementById('input');
+            var msg = input.value.trim();
+            if (!msg) return;
 
-            "damage": "Damage block script:\n\nlocal damage = 10\n\nscript.Parent.Touched:Connect(function(hit)\n    if hit.Parent:FindFirstChild('Humanoid') then\n        hit.Parent.Humanoid.Health = hit.Parent.Humanoid.Health - damage\n    end\nend)\n\nChange the damage variable to adjust how much health it removes.",
+            addUser(msg);
+            input.value = '';
 
-            "heal": "Healing block script:\n\nlocal healAmount = 25\n\nscript.Parent.Touched:Connect(function(hit)\n    if hit.Parent:FindFirstChild('Humanoid') then\n        hit.Parent.Humanoid.Health = hit.Parent.Humanoid.Health + healAmount\n    end\nend)\n\nMake it green so players know it's safe!",
+            var lower = msg.toLowerCase();
+            var response = "";
 
-            "speed": "Speed boost script:\n\nlocal speedBoost = 50\n\nscript.Parent.Touched:Connect(function(hit)\n    if hit.Parent:FindFirstChild('Humanoid') then\n        hit.Parent.Humanoid.WalkSpeed = hit.Parent.Humanoid.WalkSpeed + speedBoost\n        wait(5)\n        hit.Parent.Humanoid.WalkSpeed = hit.Parent.Humanoid.WalkSpeed - speedBoost\n    end\nend)\n\nGives a 5-second speed boost. Default speed is 16.",
+            // TRY MATH FIRST
+            var mathResult = solveMath(msg);
+            if (mathResult) {
+                response = mathResult;
+            }
 
-            "jump": "Jump boost script:\n\nlocal jumpBoost = 100\n\nscript.Parent.Touched:Connect(function(hit)\n    if hit.Parent:FindFirstChild('Humanoid') then\n        hit.Parent.Humanoid.JumpPower = hit.Parent.Humanoid.JumpPower + jumpBoost\n        wait(5)\n        hit.Parent.Humanoid.JumpPower = hit.Parent.Humanoid.JumpPower - jumpBoost\n    end\nend)\n\nDefault JumpPower is 50.",
+            // Greetings
+            if (!response && (lower.includes('hello') || lower.includes('hi') || lower.includes('hey'))) {
+                response = "Hello! How can I help?";
+            }
 
-            "door": "Clickable door script:\n\nlocal door = script.Parent\nlocal open = false\n\nscript.Parent.ClickDetector.MouseClick:Connect(function()\n    if open then\n        door.Transparency = 0\n        door.CanCollide = true\n        open = false\n    else\n        door.Transparency = 1\n        door.CanCollide = false\n        open = true\n    end\nend)\n\nAdd a ClickDetector to the door first!",
+            if (!response && (lower.includes('thank') || lower.includes('thx'))) {
+                response = "You're welcome!";
+            }
 
-            "button": "Button script:\n\nscript.Parent.ClickDetector.MouseClick:Connect(function(player)\n    print(player.Name .. ' pressed the button!')\n    -- Add your code here\nend)\n\nRequires a ClickDetector in the part.",
+            // Jokes
+            if (!response && lower.includes('joke')) {
+                response = random(jokes);
+            }
 
-            "teleport": "Teleporter script:\n\nlocal endPart = workspace.EndPart\n\nscript.Parent.Touched:Connect(function(hit)\n    if hit.Parent:FindFirstChild('Humanoid') then\n        hit.Parent:MoveTo(endPart.Position + Vector3.new(0, 3, 0))\n    end\nend)\n\nCreate two parts - entrance and 'EndPart' for the exit.",
+            // Check knowledge base
+            if (!response) {
+                for (var key in knowledgeBase) {
+                    if (lower.includes(key)) {
+                        response = knowledgeBase[key];
+                        break;
+                    }
+                }
+            }
 
-            "checkpoint": "To make checkpoints:\n\n1. Insert SpawnLocation from Model tab\n2. Position where you want respawn point\n3. Change color (different for each checkpoint)\n4. Set Duration = 0\n5. Anchor it\n\nPlayers respawn at the last one they touched!",
+            // Default
+            if (!response) {
+                response = "I can solve math problems and help with Roblox! What do you need?";
+            }
 
-            "moving platform": "Moving platform script:\n\nlocal platform = script.Parent\nlocal startPos = platform.Position\nlocal endPos = startPos + Vector3.new(20, 0, 0)\n\nwhile true do\n    platform.Position = endPos\n    wait(3)\n    platform.Position = startPos\n    wait(3)\nend\n\nFor smooth movement, use TweenService!",
+            setTimeout(function() {
+                addBot(response);
+            }, 300);
+        }
 
-            "spinning": "Spinning part script:\n\nwhile true do\n    wait(0.01)\n    script.Parent.CFrame = script.Parent.CFrame * CFrame.Angles(0, 0.1, 0)\nend\n\nAdjust 0.1 for rotation speed.",
-
-            "disappearing": "Disappearing platform script:\n\nscript.Parent.Touched:Connect(function()\n    wait(0.5)\n    script.Parent.Transparency = 1\n    script.Parent.CanCollide = false\n    wait(3)\n    script.Parent.Transparency = 0\n    script.Parent.CanCollide = true\nend)",
-
-            "coin": "Coin script:\n\nscript.Parent.Touched:Connect(function(hit)\n    local player = game.Players:GetPlayerFromCharacter(hit.Parent)\n    if player then\n        player.leaderstats.Coins.Value = player.leaderstats.Coins.Value + 1\n        script.Parent:Destroy()\n    end\nend)\n\nMake it yellow and spinning!",
-
-            "gem": "Gem script:\n\nlocal gemValue = 10\n\nscript.Parent.Touched:Connect(function(hit)\n    local player = game.Players:GetPlayerFromCharacter(hit.Parent)\n    if player then\n        player.leaderstats.Coins.Value = player.leaderstats.Coins.Value + gemValue\n        script.Parent:Destroy()\n    end\nend)",
-
-            "fire": "To add fire:\n\n1. Select part\n2. Insert → Fire\n3. Customize Size, Heat, Color in Properties\n\nGreat for lava, torches, campfires!",
-
-            "light": "To add light:\n\n1. Select part\n2. Insert → PointLight\n3. Customize Brightness, Range, Color\n\nMakes parts glow!",
-
-            "explosion": "Explosion script:\n\nscript.Parent.Touched:Connect(function(hit)\n    if hit.Parent:FindFirstChild('Humanoid') then\n        local boom = Instance.new('Explosion')\n        boom.Position = script.Parent.Position\n        boom.Parent = workspace\n        script.Parent:Destroy()\n    end\nend)",
-
-            "gui": "To make a GUI:\n\n1. StarterGui → Insert ScreenGui\n2. Add TextButton or TextLabel\n3. Customize in Properties\n4. For buttons, add LocalScript:\n\nscript.Parent.MouseButton1Click:Connect(function()\n    print('Clicked!')\nend)",
-
-            "shop": "Shop GUI script:\n\nlocal button = script.Parent\nlocal price = 100\n\nbutton.MouseButton1Click:Connect(function()\n    local player = game.Players.LocalPlayer\n    if player.leaderstats.Coins.Value >= price then\n        player.leaderstats.Coins.Value = player.leaderstats.Coins.Value - price\n        print('Purchased!')\n    end\nend)",
-
-            "leaderboard": "Leaderboard script (ServerScriptService):\n\ngame.Players.PlayerAdded:Connect(function(player)\n    local leaderstats = Instance.new('Folder')\n    leaderstats.Name = 'leaderstats'\n    leaderstats.Parent = player\n    \n    local coins = Instance.new('IntValue')\n    coins.Name = 'Coins'\n    coins.Value = 0\n    coins.Parent = leaderstats\nend)",
-
-            "team": "To create teams:\n\n1. Insert Teams service\n2. Add Team objects\n3. Set TeamColor and Name\n4. Script to assign:\n\ngame.Players.PlayerAdded:Connect(function(player)\n    player.Team = game.Teams.RedTeam\nend)",
-
-            "sound": "To add sound:\n\n1. Insert Sound in part\n2. Set SoundId = rbxassetid://[ID]\n3. Script: script.Parent.Sound:Play()\n\nSet Looped = true for music!",
-
-            "sword": "Basic sword script:\n\nlocal damage = 10\n\nscript.Parent.Handle.Touched:Connect(function(hit)\n    if script.Parent.Parent:IsA('Model') and hit.Parent:FindFirstChild('Humanoid') then\n        hit.Parent.Humanoid:TakeDamage(damage)\n    end\nend)\n\nAdd to a Tool with Handle part.",
-
-            "tool": "Basic tool script:\n\nscript.Parent.Activated:Connect(function()\n    print('Tool used!')\nend)\n\nAdd to a Tool object with Handle part.",
-
-            // === SCIENCE ===
-            "sky blue": "The sky appears blue due to Rayleigh scattering. Sunlight contains all colors, but when it enters Earth's atmosphere, it collides with gas molecules. Blue light has a shorter wavelength (about 450 nanometers) and scatters more easily than other colors. This scattered blue light reaches our eyes from all directions, making the sky appear blue.",
-            
-            "gravity": "Gravity is a fundamental force that attracts all objects with mass toward each other. On Earth, gravity gives objects weight and accelerates them at 9.8 m/s². The strength of gravity depends on mass and distance.",
-            
-            "photosynthesis": "Photosynthesis is the process by which plants convert light energy into chemical energy. Plants absorb sunlight, water, and CO2 to produce glucose (sugar) and oxygen. Overall: 6CO2 + 6H2O + light → C6H12O6 + 6O2",
-
-            // === ANIMALS ===
-
+        document.getElementById('input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                send();
+            }
+        });
+    </script>
+</body>
+</html>
 
 
 
