@@ -123,7 +123,7 @@
             "What did the ocean say to the beach? Nothing, it just waved!"
         ];
 
-        addBot("Hello! I can solve ANY math problem!\n\nTry:\n• 4x4\n• 5*3\n• 100 + 50\n• 20 - 10\n• 100 / 5\n• 12 times 7\n\nI also know about Roblox and other topics!");
+        addBot("🤖 What's up! I'm your AI assistant.\n\nI can:\n✓ Solve ANY math problem (4x4, 5*3, 100+50, etc)\n✓ Help with Roblox Studio\n✓ Answer questions about anything\n✓ Tell jokes\n\nWhat do you want to do?");
 
         function addBot(text) {
             var div = document.createElement('div');
@@ -192,11 +192,11 @@
 
             // Greetings
             if (!response && (lower.includes('hello') || lower.includes('hi') || lower.includes('hey'))) {
-                response = "Hello! How can I help?";
+                response = "👋 Yo! What do you need?";
             }
 
             if (!response && (lower.includes('thank') || lower.includes('thx'))) {
-                response = "You're welcome!";
+                response = "No problem! Anything else?";
             }
 
             // Jokes
@@ -216,7 +216,7 @@
 
             // Default
             if (!response) {
-                response = "I can solve math problems and help with Roblox! What do you need?";
+                response = "I can solve math, help with Roblox, or answer questions. Ask me anything!";
             }
 
             setTimeout(function() {
@@ -232,9 +232,6 @@
     </script>
 </body>
 </html>
-
-
-
 
 
 
